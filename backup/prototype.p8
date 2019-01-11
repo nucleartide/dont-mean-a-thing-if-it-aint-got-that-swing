@@ -27,13 +27,13 @@ pattern={
 'x..',
 }
 
-extcmd('rec')
+--extcmd('rec')
 
 function _update60()
  local beat=flr(t/fpb)+1
  if beat>#pattern then
-  extcmd('video')
-  stop()
+  --extcmd('video')
+  --stop()
  end
 
 -- get expected note index. 
