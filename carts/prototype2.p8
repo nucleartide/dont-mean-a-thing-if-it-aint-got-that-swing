@@ -14,6 +14,7 @@ crochet=60/bpm -- time per note.
 -- state.
 started=false
 start_time=0
+player_health=3
 
 -- more state.
 song_pos=0 -- secs since start.
@@ -49,11 +50,31 @@ function _draw()
  
  local i=flr(allow_beat%3)+1
  local m=track[measure]
+ local r=runtime_track[measure]
  local note
  if m ~= nil then
   note=sub(m,i,i)
   print(note)
+  
+  -- todo: handle user input.
+  
+  -- once case.
+  if btnp(🅾️) and note=='z' then
+   runtime_track[measure][i]=true
+  elseif btnp(🅾️) and note=='z' and runtime_track[measure][i] then
+   player_health -= 1
+  end
+  if btnp(❎) and note=='x' then
+   runtime_track[measure][i]=true
+  elseif btnp(🅾️) and note=='x' and runtime_track[measure][i] then
+   player_health -= 1
+  end
+  
+  -- >once case.
+  
+  -- zero case.
  end
+ print(player_health)
 end
 -->8
 -- track.
@@ -72,6 +93,14 @@ function def_track()
 end
 
 def_track()
+
+-- runtime track.
+runtime_track = {}
+
+for i=1,#track do
+ local o={nil, nil, nil}
+ add(runtime_track, o)
+end
 -->8
 -- time utils.
 
