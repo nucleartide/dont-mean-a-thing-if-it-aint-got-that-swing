@@ -50,10 +50,10 @@ st={
  -- current beat, zero-indexed.
  cur_beat=0,
  
- -- index of allowed beat.
+ -- allowed beat, zero-indexed.
  allow_beat=0,
  
- -- current measure.
+ -- current measure, zero-indexed.
  measure=0,
 
  -- current note.
@@ -99,9 +99,9 @@ function _update60()
    st.allow_beat=flr(t)
   end
   
-  st.measure=flr(st.allow_beat/3)+1
+  st.measure=flr(st.allow_beat/3)
   
-  local m=cfg.track[st.measure]
+  local m=cfg.track[st.measure+1]
   local i=flr(st.allow_beat%3)+1
   st.note=sub(m,i,i)
  end
