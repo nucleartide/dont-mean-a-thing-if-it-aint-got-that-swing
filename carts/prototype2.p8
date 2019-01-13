@@ -16,6 +16,14 @@ cfg={
   'z..',
   'x.z',
   'x..',
+  '...',
+  '...',
+  '...',
+  '...',
+  '...',
+  '...',
+  '...',
+  '...',
  },
 }
 
@@ -47,6 +55,9 @@ st={
  
  -- current measure.
  measure=0,
+
+ -- current note.
+ note='',
 }
 
 function _init()
@@ -83,12 +94,16 @@ function _update60()
   st.cur_beat=flr(t)
 
   if st.song_pos >= 0.5 then
-   st.allow_beat=ceil(st.cur_beat)
+   st.allow_beat=ceil(t)
   else
-   st.allow_beat=flr(st.cur_beat)
+   st.allow_beat=flr(t)
   end
   
   st.measure=flr(st.allow_beat/3)+1
+  
+  local m=cfg.track[st.measure]
+  local i=flr(st.allow_beat%3)+1
+  st.note=sub(m,i,i)
  end
 end
 
@@ -99,18 +114,14 @@ function _draw()
  printh('cur_beat: ' .. st.cur_beat)
  printh('allow_beat: ' .. st.allow_beat)
  printh('measure: ' .. st.measure)
+ printh('note: ' .. st.note)
 end
 -->8
 function draw()
- local i=flr(allow_beat%3)+1
+ 
  local m=track[measure]
  local r=runtime_track[measure]
- local note
  if m ~= nil then
-  note=sub(m,i,i)
-  print(note)
-  
-  -- todo: handle user input.
   
   -- once case.
   if btnp(🅾️) and note=='z' then
