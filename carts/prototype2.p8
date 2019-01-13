@@ -47,7 +47,7 @@ st={
  -- # of player lives.
  player_health=3,
  
- -- current beat.
+ -- current beat, zero-indexed.
  cur_beat=0,
  
  -- index of allowed beat.
