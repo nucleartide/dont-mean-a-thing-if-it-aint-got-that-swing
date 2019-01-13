@@ -78,11 +78,10 @@ end
 -- game loop.
 
 function _update60()
- -- start track and return.
+ -- start track.
  if not st.started and btn(🅾️) then
   st.started=true
   st.start_time=sample()
-  return
  end
  
  -- update state.
@@ -93,7 +92,7 @@ function _update60()
   
   st.cur_beat=flr(t)
 
-  if st.song_pos >= 0.5 then
+  if (t%1) >= 0.5 then
    st.allow_beat=ceil(t)
   else
    st.allow_beat=flr(t)
@@ -102,8 +101,12 @@ function _update60()
   st.measure=flr(st.allow_beat/3)
   
   local m=cfg.track[st.measure+1]
-  local i=flr(st.allow_beat%3)+1
-  st.note=sub(m,i,i)
+  local i=st.allow_beat%3+1
+  if m ~= nil then
+   st.note=sub(m,i,i)
+  else
+   st.note=''
+  end
  end
 end
 
