@@ -58,6 +58,9 @@ st={
 
  -- current note.
  note='',
+ 
+ -- last note.
+ last_note='',
 }
 
 function _init()
@@ -107,12 +110,27 @@ function _update60()
  
  st.measure=flr(st.allow_beat/3)
  
+ -- todo: does not work for
+ -- non-3/4 time signatures.
  local m=cfg.track[st.measure+1]
  local i=st.allow_beat%3+1
  if m ~= nil then
   st.note=sub(m,i,i)
+  if i>1 then
+   st.last_note=sub(m,i-1,i-1)
+  else
+   -- 1 less than above.
+   local m=cfg.track[st.measure+1-1]
+   if m ~= nil then
+    st.last_note=sub(m,2,2)
+   end
+  end
  else
   st.note=''
+  local m=cfg.track[st.measure+1-1]
+  if m ~= nil then
+   st.last_note=sub(m,2,2)
+  end
  end
  
  --
@@ -130,6 +148,18 @@ function _update60()
    st.runtime_track[st.measure+1][st.allow_beat%3+1]=true
   end
  end
+
+ --
+ -- zero case.
+ --
+ -- check the last note.
+ -- if there was a note there,
+ -- and runtime track is nil,
+ -- then decrement health.
+ -- also mark as true.
+ --
+ 
+ 
 end
 
 function _draw()
@@ -140,6 +170,7 @@ function _draw()
  printh('allow_beat: ' .. st.allow_beat)
  printh('measure: ' .. st.measure)
  printh('note: ' .. st.note)
+ printh('last_note: ' .. st.last_note)
  printh('player_health: ' .. st.player_health)
 end
 __sfx__
