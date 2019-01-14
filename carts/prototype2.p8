@@ -83,29 +83,48 @@ function _update60()
   st.started=true
   st.start_time=sample()
  end
- 
- -- update state.
- if st.started then
-  st.song_pos=sample()-st.start_time
-  
-  local t=st.song_pos/st.crochet
-  
-  st.cur_beat=flr(t)
 
-  if (t%1) >= 0.5 then
-   st.allow_beat=ceil(t)
+ -- early return.
+ if not st.started then
+  return
+ end
+
+ --
+ -- update state.
+ --
+ 
+ st.song_pos=sample()-st.start_time
+ 
+ local t=st.song_pos/st.crochet
+ 
+ st.cur_beat=flr(t)
+
+ if (t%1) >= 0.5 then
+  st.allow_beat=ceil(t)
+ else
+  st.allow_beat=flr(t)
+ end
+ 
+ st.measure=flr(st.allow_beat/3)
+ 
+ local m=cfg.track[st.measure+1]
+ local i=st.allow_beat%3+1
+ if m ~= nil then
+  st.note=sub(m,i,i)
+ else
+  st.note=''
+ end
+ 
+ --
+ -- once case.
+ --
+ 
+ local pressed=st.runtime_track[st.measure+1][st.allow_beat%3+1]
+ if btnp(🅾️) and st.note=='z' then
+  if pressed then
+   st.player_health -= 1
   else
-   st.allow_beat=flr(t)
-  end
-  
-  st.measure=flr(st.allow_beat/3)
-  
-  local m=cfg.track[st.measure+1]
-  local i=st.allow_beat%3+1
-  if m ~= nil then
-   st.note=sub(m,i,i)
-  else
-   st.note=''
+   st.runtime_track[st.measure+1][st.allow_beat%3+1]=true
   end
  end
 end
@@ -118,12 +137,10 @@ function _draw()
  printh('allow_beat: ' .. st.allow_beat)
  printh('measure: ' .. st.measure)
  printh('note: ' .. st.note)
+ printh('player_health: ' .. st.player_health)
 end
 -->8
 function draw()
- 
- local m=track[measure]
- local r=runtime_track[measure]
  if m ~= nil then
   
   -- once case.
@@ -137,10 +154,6 @@ function draw()
   elseif btnp(🅾️) and note=='x' and runtime_track[measure][i] then
    player_health -= 1
   end
-  
-  -- >once case.
-  
-  -- zero case.
  end
 end
 __sfx__
