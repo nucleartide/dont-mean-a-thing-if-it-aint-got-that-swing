@@ -118,14 +118,19 @@ function _update60()
   st.note=sub(m,i,i)
   if i>1 then
    st.last_note=sub(m,i-1,i-1)
+   --printh(st.last_note)
   else
    -- 1 less than above.
    local m=cfg.track[st.measure+1-1]
+   --printh(m)
    if m ~= nil then
-    st.last_note=sub(m,2,2)
+    st.last_note=sub(m,3,3)
+   else
+    st.last_note='?'
    end
   end
  else
+  assert(false)
   st.note=''
   local m=cfg.track[st.measure+1-1]
   if m ~= nil then

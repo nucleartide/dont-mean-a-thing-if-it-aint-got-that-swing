@@ -16,6 +16,14 @@ cfg={
   'z..',
   'x.z',
   'x..',
+  '...',
+  '...',
+  '...',
+  '...',
+  '...',
+  '...',
+  '...',
+  '...',
  },
 }
 
@@ -39,14 +47,20 @@ st={
  -- # of player lives.
  player_health=3,
  
- -- current beat.
+ -- current beat, zero-indexed.
  cur_beat=0,
  
- -- index of allowed beat.
+ -- allowed beat, zero-indexed.
  allow_beat=0,
  
- -- current measure.
+ -- current measure, zero-indexed.
  measure=0,
+
+ -- current note.
+ note='',
+ 
+ -- last note.
+ last_note='',
 }
 
 function _init()
@@ -67,29 +81,90 @@ end
 -- game loop.
 
 function _update60()
- -- start track and return.
+ -- start track.
  if not st.started and btn(🅾️) then
   st.started=true
   st.start_time=sample()
+ end
+
+ -- early return.
+ if not st.started then
   return
  end
- 
- -- update state.
- if st.started then
-  st.song_pos=sample()-st.start_time
-  
-  local t=st.song_pos/st.crochet
-  
-  st.cur_beat=flr(t)
 
-  if st.song_pos >= 0.5 then
-   st.allow_beat=ceil(t)
-  else
-   st.allow_beat=flr(t)
-  end
-  
-  st.measure=flr(st.allow_beat/3)+1
+ --
+ -- update state.
+ --
+ 
+ st.song_pos=sample()-st.start_time
+ 
+ local t=st.song_pos/st.crochet
+ 
+ st.cur_beat=flr(t)
+
+ if (t%1) >= 0.5 then
+  st.allow_beat=ceil(t)
+ else
+  st.allow_beat=flr(t)
  end
+ 
+ st.measure=flr(st.allow_beat/3)
+ 
+ -- todo: does not work for
+ -- non-3/4 time signatures.
+ local m=cfg.track[st.measure+1]
+ local i=st.allow_beat%3+1
+ if m ~= nil then
+  st.note=sub(m,i,i)
+  if i>1 then
+   st.last_note=sub(m,i-1,i-1)
+   --printh(st.last_note)
+  else
+   -- 1 less than above.
+   local m=cfg.track[st.measure+1-1]
+   --printh(m)
+   if m ~= nil then
+    st.last_note=sub(m,3,3)
+   else
+    st.last_note='?'
+   end
+  end
+ else
+  assert(false)
+  st.note=''
+  local m=cfg.track[st.measure+1-1]
+  if m ~= nil then
+   st.last_note=sub(m,2,2)
+  end
+ end
+ 
+ --
+ -- once case.
+ --
+ 
+ local pressed=st.runtime_track[st.measure+1][st.allow_beat%3+1]
+ if
+  btnp(🅾️) and st.note=='z' or
+  btnp(❎) and st.note=='x'
+ then
+  if pressed then
+   st.player_health -= 1
+  else
+   st.runtime_track[st.measure+1][st.allow_beat%3+1]=true
+  end
+ end
+
+ --
+ -- zero case.
+ --
+ -- check the last note.
+ -- if there was a note there,
+ -- and runtime track is nil,
+ -- then decrement health.
+ -- also mark as true.
+ --
+ 
+ 
 end
 
 function _draw()
@@ -99,35 +174,9 @@ function _draw()
  printh('cur_beat: ' .. st.cur_beat)
  printh('allow_beat: ' .. st.allow_beat)
  printh('measure: ' .. st.measure)
-end
--->8
-function draw()
- local i=flr(allow_beat%3)+1
- local m=track[measure]
- local r=runtime_track[measure]
- local note
- if m ~= nil then
-  note=sub(m,i,i)
-  print(note)
-  
-  -- todo: handle user input.
-  
-  -- once case.
-  if btnp(🅾️) and note=='z' then
-   runtime_track[measure][i]=true
-  elseif btnp(🅾️) and note=='z' and runtime_track[measure][i] then
-   player_health -= 1
-  end
-  if btnp(❎) and note=='x' then
-   runtime_track[measure][i]=true
-  elseif btnp(🅾️) and note=='x' and runtime_track[measure][i] then
-   player_health -= 1
-  end
-  
-  -- >once case.
-  
-  -- zero case.
- end
+ printh('note: ' .. st.note)
+ printh('last_note: ' .. st.last_note)
+ printh('player_health: ' .. st.player_health)
 end
 __sfx__
 000400000000019050200502305026050260502705027050280502805026050230501f0501a05014050120500e0500a0500805007050080500a05010050240500000000000000000000000000000000000000000
