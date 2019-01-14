@@ -120,7 +120,10 @@ function _update60()
  --
  
  local pressed=st.runtime_track[st.measure+1][st.allow_beat%3+1]
- if btnp(🅾️) and st.note=='z' then
+ if
+  btnp(🅾️) and st.note=='z' or
+  btnp(❎) and st.note=='x'
+ then
   if pressed then
    st.player_health -= 1
   else
@@ -138,23 +141,6 @@ function _draw()
  printh('measure: ' .. st.measure)
  printh('note: ' .. st.note)
  printh('player_health: ' .. st.player_health)
-end
--->8
-function draw()
- if m ~= nil then
-  
-  -- once case.
-  if btnp(🅾️) and note=='z' then
-   runtime_track[measure][i]=true
-  elseif btnp(🅾️) and note=='z' and runtime_track[measure][i] then
-   player_health -= 1
-  end
-  if btnp(❎) and note=='x' then
-   runtime_track[measure][i]=true
-  elseif btnp(🅾️) and note=='x' and runtime_track[measure][i] then
-   player_health -= 1
-  end
- end
 end
 __sfx__
 000400000000019050200502305026050260502705027050280502805026050230501f0501a05014050120500e0500a0500805007050080500a05010050240500000000000000000000000000000000000000000
