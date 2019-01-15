@@ -125,12 +125,12 @@ function _update60()
   else
    -- 1 less than above.
    local m=cfg.track[st.measure+1-1]
-   st.last_note=m~=nil and sub(m,3,3) or '?'
+   st.last_note=m~=nil and sub(m,3,3) or ''
   end
  else
   st.note=''
   local m=cfg.track[st.measure+1-1]
-  st.last_note=m~=nil and sub(m,3,3) or '?'
+  st.last_note=m~=nil and sub(m,3,3) or ''
  end
 
  --
@@ -145,14 +145,9 @@ function _update60()
    btnp(🅾️) and st.note=='z' or
    btnp(❎) and st.note=='x'
   then
-   -- if button was already pressed,
-   if pressed then
-    -- then decrement health and mark as handled.
-    st.player_health -= 1
-    st.runtime_track[measure][beat]=false
-   else
-    st.runtime_track[measure][beat]=true
-   end
+   -- if button was already pressed, decrement health.
+   if pressed then st.player_health -= 1
+   else st.runtime_track[measure][beat]=true end
   end
  end
 
@@ -160,13 +155,26 @@ function _update60()
  -- zero case.
  --
  -- check the last note.
- -- if there was a note there,
+ -- if there was a last note,
  -- and runtime track is nil,
- -- then decrement health.
- -- also mark as true.
+ -- then decrement health and mark as true.
  --
- 
- 
+
+ do
+  local measure=st.measure+1
+  local beat=st.allow_beat%cfg.beats_per_measure+1
+
+  local last_measure = measure
+  local last_beat    = beat==1 and cfg.beats_per_measure or (beat-1)
+
+  local had_last_note=st.last_note == 'z' or st.last_note == 'x'
+  local handled_last_beat=st.runtime_track[last_measure][last_beat]
+
+  if had_last_note and not handled_last_beat then
+   st.player_health -= 1
+   st.runtime_track[last_measure][last_beat]=true
+  end
+ end
 end
 
 function _draw()
