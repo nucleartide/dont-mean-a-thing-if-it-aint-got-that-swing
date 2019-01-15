@@ -5,6 +5,9 @@ __lua__
 cfg={
  -- beats per minute.
  bpm=120,
+
+ -- beats per measure.
+ beats_per_measure=3,
  
  -- track definition.
  track={
@@ -108,49 +111,48 @@ function _update60()
   st.allow_beat=flr(t)
  end
  
- st.measure=flr(st.allow_beat/3)
- 
- -- todo: does not work for
- -- non-3/4 time signatures.
+ st.measure=flr(st.allow_beat/cfg.beats_per_measure)
+
+ --
+ -- compute note and last_note.
+ --
+
  local m=cfg.track[st.measure+1]
- local i=st.allow_beat%3+1
+ local i=st.allow_beat%cfg.beats_per_measure+1
  if m ~= nil then
   st.note=sub(m,i,i)
-  if i>1 then
-   st.last_note=sub(m,i-1,i-1)
-   --printh(st.last_note)
+  if i>1 then st.last_note=sub(m,i-1,i-1)
   else
    -- 1 less than above.
    local m=cfg.track[st.measure+1-1]
-   --printh(m)
-   if m ~= nil then
-    st.last_note=sub(m,3,3)
-   else
-    st.last_note='?'
-   end
+   st.last_note=m~=nil and sub(m,3,3) or '?'
   end
  else
-  assert(false)
   st.note=''
   local m=cfg.track[st.measure+1-1]
-  if m ~= nil then
-   st.last_note=sub(m,2,2)
-  end
+  st.last_note=m~=nil and sub(m,3,3) or '?'
  end
- 
+
  --
  -- once case.
  --
- 
- local pressed=st.runtime_track[st.measure+1][st.allow_beat%3+1]
- if
-  btnp(🅾️) and st.note=='z' or
-  btnp(❎) and st.note=='x'
- then
-  if pressed then
-   st.player_health -= 1
-  else
-   st.runtime_track[st.measure+1][st.allow_beat%3+1]=true
+
+ do
+  local measure=st.measure+1
+  local beat=st.allow_beat%cfg.beats_per_measure+1
+  local pressed=st.runtime_track[measure][beat]
+  if
+   btnp(🅾️) and st.note=='z' or
+   btnp(❎) and st.note=='x'
+  then
+   -- if button was already pressed,
+   if pressed then
+    -- then decrement health and mark as handled.
+    st.player_health -= 1
+    st.runtime_track[measure][beat]=false
+   else
+    st.runtime_track[measure][beat]=true
+   end
   end
  end
 
@@ -178,5 +180,3 @@ function _draw()
  printh('last_note: ' .. st.last_note)
  printh('player_health: ' .. st.player_health)
 end
-__sfx__
-000400000000019050200502305026050260502705027050280502805026050230501f0501a05014050120500e0500a0500805007050080500a05010050240500000000000000000000000000000000000000000
