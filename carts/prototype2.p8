@@ -187,4 +187,6 @@ function _draw()
  printh('note: ' .. st.note)
  printh('last_note: ' .. st.last_note)
  printh('player_health: ' .. st.player_health)
+ circ(64-10,94,5,7)
+ circ(64+10,94,5,7)
 end
