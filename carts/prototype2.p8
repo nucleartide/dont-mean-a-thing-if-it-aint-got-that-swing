@@ -187,6 +187,7 @@ end
 
 function _draw()
  cls(15)
+
  printh('')
  printh('song_pos: ' .. st.song_pos)
  printh('cur_beat: ' .. st.cur_beat)
@@ -195,6 +196,26 @@ function _draw()
  printh('note: ' .. st.note)
  printh('last_note: ' .. st.last_note)
  printh('player_health: ' .. st.player_health)
+
+ -- for each measure in the track,
+ for i=1,#cfg.track do
+  -- for each note in the measure,
+  for j=1,cfg.beats_per_measure do
+   -- compute note position
+   local note_pos = (i-1) * cfg.beats_per_measure + (j-1)
+
+   -- only draw a circle if the note is a z
+   local measure = cfg.track[i]
+   local note    = sub(measure, j, j)
+
+   -- if the note position exceeds the current song position,
+   if note_pos*st.crochet > st.song_pos and note == 'z' then
+    -- draw a circle for that note.
+    circfill(64-10, 94 - (note_pos*st.crochet - st.song_pos) * 20, 5, 7)
+   end
+  end
+ end
+
  circ(64-10,94,5,7)
  circ(64+10,94,5,7)
 end
