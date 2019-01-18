@@ -34,6 +34,8 @@ cfg={
 -- state.
 st={
  -- time per note.
+ -- units: seconds per min,
+ -- beats per min.
  crochet=60/cfg.bpm,
  
  -- notes hit by player.
@@ -57,7 +59,8 @@ st={
  -- allowed beat, zero-indexed.
  allow_beat=0,
  
- -- current measure, zero-indexed.
+ -- current measure,
+ -- zero-indexed.
  measure=0,
 
  -- current note.
@@ -86,7 +89,9 @@ end
 
 function _update60()
  -- start track.
- if not st.started and btn(🅾️) then
+ if
+  not st.started and btn(🅾️)
+ then
   st.started=true
   st.start_time=sample()
  end
@@ -100,38 +105,59 @@ function _update60()
  -- update state.
  --
  
- st.song_pos=sample()-st.start_time
+ -- song pos
+ st.song_pos=
+   sample()
+  -st.start_time
  
+ -- temp var.
  local t=st.song_pos/st.crochet
  
+ -- current beat.
  st.cur_beat=flr(t)
 
+ -- allowed beat.
  if (t%1) >= 0.5 then
   st.allow_beat=ceil(t)
  else
   st.allow_beat=flr(t)
  end
  
- st.measure=flr(st.allow_beat/cfg.beats_per_measure)
+ -- measure.
+ st.measure=
+  flr(
+   st.allow_beat/
+   cfg.beats_per_measure
+  )
 
  --
  -- compute note and last_note.
  --
 
+ -- current measure.
  local m=cfg.track[st.measure+1]
- local i=st.allow_beat%cfg.beats_per_measure+1
+
+ -- current note within
+ -- measure.
+ local i=1+
+  st.allow_beat%
+  cfg.beats_per_measure
+ 
+ -- note.
  if m ~= nil then
   st.note=sub(m,i,i)
-  if i>1 then st.last_note=sub(m,i-1,i-1)
-  else
-   -- 1 less than above.
-   local m=cfg.track[st.measure+1-1]
-   st.last_note=m~=nil and sub(m,3,3) or ''
-  end
  else
   st.note=''
-  local m=cfg.track[st.measure+1-1]
-  st.last_note=m~=nil and sub(m,3,3) or ''
+ end
+ 
+ -- last note.
+ if m~=nil and i>1 then
+  st.last_note=sub(m,i-1,i-1)
+ else
+  local m=
+   cfg.track[st.measure+1-1]
+  st.last_note=
+   m~=nil and sub(m,3,3) or ''
  end
 
  --
@@ -195,7 +221,9 @@ function _draw()
   -- for each note in the measure,
   for j=1,cfg.beats_per_measure do
    -- compute note position
-   local note_pos = (i-1) * cfg.beats_per_measure + (j-1)
+   local note_pos = 0
+    + (i-1) * cfg.beats_per_measure
+    + (j-1)
 
    -- only draw a circle if the note is a z
    local measure = cfg.track[i]
