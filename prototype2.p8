@@ -87,7 +87,7 @@ end
 -->8
 -- game loop.
 
-function _update60()
+function update60()
  -- start track.
  if
   not st.started and btn(🅾️)
@@ -194,12 +194,6 @@ function _update60()
  -- we missed a note
  -- completely.
  --
- -- check the last note.
- -- if there was a last note,
- -- and we didn't hit,
- -- then decrement health and
- -- mark as true.
- --
 
  local last_measure = beat==1
   and measure-1
@@ -209,26 +203,49 @@ function _update60()
   and cfg.beats_per_measure
   or  (beat-1)
 
- local had_last_note=st.last_note == 'z' or st.last_note == 'x'
- local handled_last_beat=st.runtime_track[last_measure][last_beat]
+ local had_last_note=false
+  or st.last_note == 'z'
+  or st.last_note == 'x'
+ 
+ local rt=
+  st.runtime_track
+   [last_measure]
 
- if had_last_note and not handled_last_beat then
+ local handled_last_beat=
+  rt
+  and rt[last_beat]
+  or false
+
+ -- if there was a last note,
+ -- and we didn't hit,
+ -- then decrement health and
+ -- mark last note as
+ -- processed.
+ if true
+  and had_last_note
+  and not handled_last_beat
+ then
   st.player_health -= 1
-  st.runtime_track[last_measure][last_beat]=true
+  st.runtime_track
+   [last_measure]
+   [last_beat]
+   =true
  end
 end
 
-function _draw()
+function draw()
  cls(15)
-
- printh('')
- printh('song_pos: ' .. st.song_pos)
- printh('cur_beat: ' .. st.cur_beat)
- printh('allow_beat: ' .. st.allow_beat)
- printh('measure: ' .. st.measure)
- printh('note: ' .. st.note)
- printh('last_note: ' .. st.last_note)
- printh('player_health: ' .. st.player_health)
+ 
+ -- debug info.
+ ?'started:'..tostr(st.started)
+ ?'songpos:'..tostr(st.song_pos)
+ ?'hp:'..tostr(st.player_health)
+ ?'curbeat:'..tostr(st.cur_beat)
+ ?'allow:'..tostr(st.allow_beat)
+ ?'measure:'..tostr(st.measure)
+ ?'note:'..tostr(st.note)
+ ?'last:'..tostr(st.last_note)
+ do return end
 
  -- for each measure in the track,
  for i=1,#cfg.track do
